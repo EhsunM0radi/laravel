@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title')
-    "task {{}}"
+    "Task {{$task->id}}"
 @endsection
 
 @section('content')

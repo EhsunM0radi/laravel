@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Project;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ProjectsController extends Controller
 {
@@ -14,7 +15,11 @@ class ProjectsController extends Controller
      */
     public function index()
     {
-        return view('projects.index', ['projects' => Project::all()]);
+        if (Auth::check()) {
+            return view('projects.index', ['projects' => Project::all(), 'user' => Auth::user()]);
+        } else {
+            return redirect()->route('login');
+        }
     }
 
     /**
@@ -24,7 +29,11 @@ class ProjectsController extends Controller
      */
     public function create()
     {
-        return view('projects.create', ['projects' => Project::all()]);
+        if (Auth::check()) {
+            return view('projects.create', ['projects' => Project::all(), 'user' => Auth::user()]);
+        } else {
+            return redirect()->route('login');
+        }
     }
 
     /**
@@ -35,18 +44,23 @@ class ProjectsController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'required|string',
-            'creator' => 'required|string|max:255',
-        ]);
-        $project = new Project([
-            'title' => $request->input('title'),
-            'creator' => $request->input('creator'),
-            'description' => $request->input('description'),
-        ]);
-        $project->save();
-        return redirect()->route('projects.index')->with('success', 'Project created successfully.');
+
+        if (Auth::check()) {
+            $request->validate([
+                'title' => 'required|string|max:255',
+                'description' => 'required|string',
+                'creator' => 'required',
+            ]);
+            $project = new Project([
+                'title' => $request->input('title'),
+                'creator' => $request->input('creator'),
+                'description' => $request->input('description'),
+            ]);
+            $project->save();
+            return redirect()->route('projects.index')->with('success', 'Project created successfully.');
+        } else {
+            return redirect()->route('login');
+        }
     }
 
     /**
@@ -55,15 +69,17 @@ class ProjectsController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Project $project)
     {
-        $project = Project::find($id);
+        if (Auth::check()) {
+            if (!$project) {
+                return redirect()->route('projects.index')->with('error', 'Project not found.');
+            }
 
-        if (!$project) {
-            return redirect()->route('projects.index')->with('error', 'Project not found.');
+            return view('projects.show', ['project' => $project]);
+        } else {
+            return redirect()->route('login');
         }
-
-        return view('projects.show', ['id' => $id, 'project' => $project]);
     }
 
     /**
@@ -72,13 +88,16 @@ class ProjectsController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(Project $project)
     {
-        $project = Project::find($id);
-        if (!$project) {
-            return redirect()->route('projects.index')->with('error', 'Project not found.');
+        if (Auth::check()) {
+            if (!$project) {
+                return redirect()->route('projects.index')->with('error', 'Project not found.');
+            }
+            return view('projects.edit', ['project' => $project, 'user' => Auth::user()]);
+        } else {
+            return redirect()->route('login');
         }
-        return view('projects.edit', ['id' => $id, 'project' => $project]);
     }
 
     /**
@@ -88,24 +107,31 @@ class ProjectsController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Project $project, Request $request)
     {
-        dd($request->all());
+        $this->authorize('update', $project);
 
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'creator' => 'required|string|max:255',
-            'description' => 'required|string',
-        ]);
-        if (!$request->isMethod('put')) {
-            // Handle invalid request method (optional)
-            return redirect()->route('projects.index')->with('error', 'Invalid request method.');
+        if (Auth::check()) {
+            $incomingFields = $request->validate([
+                'title' => 'required|string|max:255',
+                'creator' => 'required',
+                'description' => 'required|string',
+            ]);
+            if (!$request->isMethod('put')) {
+                // Handle invalid request method (optional)
+                return redirect()->route('projects.index')->with('error', 'Invalid request method.');
+            }
+
+            $incomingFields['title'] = strip_tags($incomingFields['title']);
+            $incomingFields['creator'] = strip_tags($incomingFields['creator']);
+            $incomingFields['description'] = strip_tags($incomingFields['description']);
+
+            $project->update($incomingFields);
+
+            return redirect()->route('projects.show', ['project' => $project])->with('success', 'Project updated successfully.');
+        } else {
+            return redirect()->route('login');
         }
-        $project = Project::findOrFail($id);
-
-        $project->update($request->all());
-
-        return 'fdsljfld';
     }
 
     /**
@@ -114,8 +140,18 @@ class ProjectsController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Project $project)
     {
-        //
+        $this->authorize('destroy', $project);
+
+        if (Auth::check()) {
+            $project->delete();
+
+            // Redirect to a specified route
+            return redirect()->route('projects.index')->with('success', 'Project deleted successfully.');
+        } else {
+            // User is not authenticated, redirect to the login page
+            return redirect()->route('login');
+        }
     }
 }

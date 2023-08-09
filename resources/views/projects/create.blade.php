@@ -1,9 +1,8 @@
 @extends('layouts.app')
 
 @section('title')
-    "create a new project"
+    "Create Project"
 @endsection
-
 @section('content')
     @include('projects.partials.create-project-form')
 

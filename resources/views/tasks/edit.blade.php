@@ -1,9 +1,9 @@
 @extends('layouts.app')
 
 @section('title')
-    "task {{}}"
+    "Edit Task {{$task->id}}"
 @endsection
 
 @section('content')
-    @include('task.partials.edit-task-form')
+    @include('tasks.partials.edit-task-form')
 @endsection

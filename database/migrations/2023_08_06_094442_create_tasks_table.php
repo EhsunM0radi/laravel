@@ -17,7 +17,8 @@ class CreateTasksTable extends Migration
             $table->id();
             $table->string('title');
             $table->text('description');
-            $table->string('creator');
+            $table->unsignedBigInteger('creator');
+            $table->foreign('creator')->references('id')->on('users')->onDelete('Cascade')->onUpdate('Cascade');
             $table->unsignedBigInteger('project_id'); // Foreign key column
 
             // Define foreign key constraint

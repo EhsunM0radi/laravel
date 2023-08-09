@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title')
-    "edit project {{}}"
+    "Edit Project {{$project->id}}"
 @endsection
 
 @section('content')

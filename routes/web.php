@@ -1,9 +1,12 @@
 <?php
 
-use App\Http\Controllers\DashboardController;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\TasksController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ProjectsController;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\DashboardController;
 use SebastianBergmann\CodeCoverage\Report\Html\Dashboard;
 
 /*
@@ -17,19 +20,25 @@ use SebastianBergmann\CodeCoverage\Report\Html\Dashboard;
 |
 */
 
-Route::get('/', DashboardController::class)->name('dashboard');
+Route::get('/', function () {
+    return redirect()->route('home');
+});
+Route::get('/home', [HomeController::class, 'index'])->name('home');
 //projectscontrollers
 Route::get('/projects', [ProjectsController::class, 'index'])->name('projects.index');
 Route::get('/projects/create', [ProjectsController::class, 'create'])->name('projects.create');
-Route::get('/projects/{id}', [ProjectsController::class, 'show'])->name('projects.show');
-Route::get('/projects/{id}/edit', [ProjectsController::class, 'edit'])->name('projects.edit');
+Route::get('/projects/{project:id}', [ProjectsController::class, 'show'])->name('projects.show');
+Route::get('/projects/{project:id}/edit', [ProjectsController::class, 'edit'])->name('projects.edit');
 Route::post('/projects', [ProjectsController::class, 'store'])->name('projects.store');
-Route::put('/projects/{id}', [ProjectsController::class, 'update'])->name('projects.update');
-Route::delete('projects/{id}', [ProjectsController::class, 'delete'])->name('projects.delete');
+Route::put('/projects/{project:id}', [ProjectsController::class, 'update'])->name('projects.update');
+Route::delete('projects/{project:id}', [ProjectsController::class, 'destroy'])->name('projects.destroy');
 //tasksController
-Route::get('/tasks/create', [tasksController::class, 'create'])->name('tasks.create');
-Route::get('/tasks/{id}', [tasksController::class, 'show'])->name('tasks.show');
-Route::get('/tasks/{id}/edit', [tasksController::class, 'edit'])->name('tasks.edit');
-Route::post('/tasks', [tasksController::class, 'store'])->name('tasks.store');
-Route::put('/tasks/{id}', [tasksController::class, 'update'])->name('tasks.update');
-Route::delete('tasks/{id}', [tasksController::class, 'delete'])->name('tasks.delete');
+Route::get('/tasks', [TasksController::class, 'index'])->name('tasks.index');
+Route::get('/tasks/create', [TasksController::class, 'create'])->name('tasks.create');
+Route::get('/tasks/{task:id}', [TasksController::class, 'show'])->name('tasks.show');
+Route::get('/tasks/{task:id}/edit', [TasksController::class, 'edit'])->name('tasks.edit');
+Route::post('/tasks', [TasksController::class, 'store'])->name('tasks.store');
+Route::put('/tasks/{task:id}', [TasksController::class, 'update'])->name('tasks.update');
+Route::delete('tasks/{task:id}', [TasksController::class, 'destroy'])->name('tasks.destroy');
+
+Auth::routes();

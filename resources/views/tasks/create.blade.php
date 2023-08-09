@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title')
-    "task {{}}"
+    "Create Task"
 @endsection
 
 @section('content')

@@ -5,8 +5,9 @@
                 <div class="card-header">{{ __('Edit project') }}</div>
 
                 <div class="card-body">
-                    <form action="{{ route('projects.update',$id) }}" method="PUT">
+                    <form action="{{ route('projects.update',['project'=> $project]) }}" method="POST">
                         @csrf
+                        @method('PUT')
                         <div class="form-group">
                             <label for="title">{{ __('Title') }}</label>
                             <input id="title" type="text" class="form-control @error('title') is-invalid @enderror" name="title" value="{{$project['title']}}" required autofocus>
@@ -17,15 +18,12 @@
                             @enderror
                         </div>
 
-                        <div class="form-group">
-                            <label for="creator">{{ __('Creator') }}</label>
-                            <input id="creator" type="text" class="form-control @error('creator') is-invalid @enderror" name="creator" value="{{$project['creator']}}" required>
+                            <input id="creator" type="hidden" class="form-control @error('creator') is-invalid @enderror" name="creator" value="{{$user->id}}" required>
                             @error('creator')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
                                 </span>
                             @enderror
-                        </div>
 
                         <div class="form-group">
                             <label for="description">{{ __('Description') }}</label>

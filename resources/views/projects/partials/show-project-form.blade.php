@@ -24,7 +24,7 @@
 
                         <div class="form-group">
                             <label for="creator">{{ __('Creator') }}</label>
-                            <input id="creator" disabled type="text" class="form-control @error('creator') is-invalid @enderror" name="creator" value="{{$project['creator']}}" required>
+                            <input id="creator" disabled type="text" class="form-control @error('creator') is-invalid @enderror" name="creator" value="{{$project->_creator->name}}" required>
                             @error('creator')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>

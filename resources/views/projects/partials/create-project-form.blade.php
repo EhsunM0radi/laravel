@@ -18,15 +18,13 @@
                             @enderror
                         </div>
 
-                        <div class="form-group">
-                            <label for="creator">{{ __('Creator') }}</label>
-                            <input id="creator" type="text" class="form-control @error('creator') is-invalid @enderror" name="creator" value="" required>
+                            <input id="creator" type="hidden" class="form-control @error('creator') is-invalid @enderror" name="creator" value="{{$user->id}}" required>
                             @error('creator')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
                                 </span>
                             @enderror
-                        </div>
+                        
 
                         <div class="form-group">
                             <label for="description">{{ __('Description') }}</label>

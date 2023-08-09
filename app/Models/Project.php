@@ -14,4 +14,9 @@ class Project extends Model
         'creator',
         'description'
     ];
+
+    public function _creator()
+    {
+        return $this->belongsTo(User::class, 'creator');
+    }
 }

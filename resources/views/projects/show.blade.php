@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title')
-    "project {{}}"
+    "Project {{$project->id}}"
 @endsection
 
 @section('content')

@@ -1,13 +1,6 @@
 @extends('layouts.app')
 
-@section('title','projects')
-
-@section('content')
-    <!-- resources/views/index.blade.php -->
-
-@extends('layouts.app')
-
-@section('title', 'projects List')
+@section('title','Projects')
 
 @section('content')
 
@@ -16,34 +9,77 @@
             {{ session('success') }}
         </div>
     @endif
-<div class="container">
-    <div class="card">
-        <div class="card-header">{{ __('projects List') }}</div>
-
+    <div class="container">
+      <a href="{{ route('projects.create') }}" style="display: inline-block;"><h4>Add new Project +</h4></a><br>
+      <div class="card">
+        <div class="card-header">{{ __('Projects List') }}</div>
+    
         <div class="card-body">
+          <div class="table-responsive">
             <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Title</th>
-                        <th>Creator</th>
-                        <th>Description</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($projects as $project)
-                    <tr>
-                        <td>{{ $project->id }}</td>
-                        <td>{{ $project->title }}</td>
-                        <td>{{ $project->creator }}</td>
-                        <td>{{ $project->description }}</td>
-                    </tr>
-                    @endforeach
-                </tbody>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Title</th>
+                  <th>Creator</th>
+                  <th>Description</th>
+                  <th>Delete</th>
+                  <th>Edit</th>
+                  <th>View</th>
+                </tr>
+              </thead>
+              <tbody>
+                @foreach ($projects as $project)
+                  <tr>
+                    <td>{{ $project->id }}</td>
+                    <td>{{ $project->title }}</td>
+                    <td>{{ $project->_creator->name }}</td>
+                    <td>{{ $project->description }}</td>
+                    <td>
+                      <button {{$user->id==$project->creator?'':'disabled';}} type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteModal{{ $project->id }}">
+                        Delete
+                      </button>
+                      <div class="modal fade" id="deleteModal{{ $project->id }}" tabindex="-1" role="dialog">
+                        <div class="modal-dialog" role="document">
+                          <div class="modal-content">
+                            <div class="modal-header">
+                              <h5 class="modal-title">Delete Confirmation</h5>
+                              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                              </button>
+                            </div>
+                            <div class="modal-body">
+                              <p>Are you sure you want to delete?</p>
+                            </div>
+                            <div class="modal-footer">
+                              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                              <form action="{{ route('projects.destroy', ['project' => $project]) }}" method="POST">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-danger">Delete</button>
+                              </form>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <form action="{{ route('projects.edit', ['project' => $project]) }}" method="GET">
+                        <button {{$user->id==$project->creator?'':'disabled';}} class="btn btn-dark" type="submit">Edit</button>
+                      </form>
+                    </td>
+                    <td>
+                      <form action="{{ route('projects.show', ['project' => $project]) }}" method="GET">
+                        <button class="btn btn-primary" type="submit">View</button>
+                      </form>
+                    </td>
+                  </tr>
+                @endforeach
+              </tbody>
             </table>
+          </div>
         </div>
+      </div>
     </div>
-</div>
-@endsection
 
 @endsection
