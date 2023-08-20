@@ -47,7 +47,11 @@
                               </select>
                             </div>
 
-
+                            <div id="selectedUsersContainer">
+                                <h6>Roles: </h6><br>
+                                <!-- Selected users will be displayed here -->
+                            </div><br>
+                            
 
                         <div class="form-group mb-0">
                             <button type="submit" class="btn btn-primary">
@@ -61,52 +65,82 @@
     </div>
 </div>
 <script>
-    $(document).ready(function() {
-
+$(document).ready(function() {
     $('.js-example-basic-multiple').select2(); // Initialize the select2 plugin
-    $('#selectedUsers').on('change', function() {
-        var selectedUserIds = $(this).val(); // Get an array of selected user IDs
 
-        // Make an AJAX request to send the selectedUserIds to the server
-        $.ajax({
-            type: 'POST',
-            url: '{{ route('projects.handle.selected.users') }}', // Replace with your actual route URL
-            data: { _token: '{{ csrf_token() }}', selectedUsers: selectedUserIds },
-            success: function(response) {
-                // Process the response from the server if needed
-                var selectedUsersContainer = $('#selectedUsersContainer');
-                selectedUsersContainer.empty();
+    var selectedUsersAndRoles = [];
 
-                let count = 0;
-                $.each(response.selectedUsers, function(index, user) {
-                    selectedUsersContainer.append(`<p>${user.name}</p>`);
+    var selectedUsersContainer = $('#selectedUsersContainer');
 
-                    // Create a new <select> element for the role
-                    var selectElement = $('<select>', {
-                        class: 'js-example-basic-single', // Use single selection for roles
-                        name: 'role'+String(count)
-                    });
+    function updateUserRole(index, newRole) {
+        selectedUsersAndRoles[index].role = newRole;
+    }
 
-                    // Loop through the roles and add options to the <select> element
-                    @foreach ($roles as $role)
-                        selectElement.append($('<option>', {
-                            value: '{{ $role }}',
-                            text: '{{ $role }}'
-                        }));
-                    @endforeach
+    function rebuildUI() {
+        selectedUsersContainer.empty();
 
-                    // Append the <select> element to the container
-                    selectedUsersContainer.append(selectElement);
-                    count++;
+        $.each(selectedUsersAndRoles, function(index, userRole) {
+            selectedUsersContainer.append(`<p style="display:inline-block">${userRole.name}</p>&nbsp`);
+
+            var selectElement = $('<select>', {
+                class: 'js-example-basic-single',
+                name: 'role' + index,
+                id: `${userRole.name}-role`
+            });
+
+            @foreach ($roles as $role)
+                var option = $('<option>', {
+                    value: '{{ $role }}',
+                    text: '{{ $role }}'
                 });
 
-                // Initialize Select2 for the new <select> element(s)
-                $('.js-example-basic-single').select2(); // Use correct class for single selection
-            },
-            error: function(error) {
-                console.error('Error:', error);
+                if ('{{ $role }}' === userRole.role) {
+                    option.attr('selected', 'selected');
+                }
+
+                selectElement.append(option);
+            @endforeach
+
+            selectedUsersContainer.append(selectElement).append('<br>');
+
+            if (!selectElement.hasClass('select2-hidden-accessible')) {
+                selectElement.select2();
+
+                selectElement.on('change', function() {
+                    var newRole = $(this).val();
+                    updateUserRole(index, newRole);
+
+                    // Use setTimeout to update the UI after a small delay
+                    setTimeout(function() {
+                        rebuildUI();
+                    }, 100);
+                });
             }
         });
+    }
+
+    // Initial UI setup
+    rebuildUI();
+
+    $('#selectedUsers').on('change', function() {
+        // Update selectedUsersAndRoles array based on the UI
+        selectedUsersAndRoles = [];
+        
+        $('.js-example-basic-multiple option:selected').each(function() {    
+            var userId = $(this).val();
+            var userName = $(this).text();
+            var existingUserRole = $('#'+ userName +'-role').val();
+            var userRole = {
+                id: userId,
+                name: userName,
+                role: existingUserRole ? existingUserRole : ''
+            };
+
+            selectedUsersAndRoles.push(userRole);
+        });
+
+        // Rebuild the UI
+        rebuildUI();
     });
 });
 

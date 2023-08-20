@@ -94,7 +94,8 @@ $(document).ready(function() {
 
             var selectElement = $('<select>', {
                 class: 'js-example-basic-single',
-                name: 'role' + index
+                name: 'role' + index,
+                id: `${userRole.name}-role`
             });
 
             @foreach ($roles as $role)
@@ -134,16 +135,15 @@ $(document).ready(function() {
     $('#selectedUsers').on('change', function() {
         // Update selectedUsersAndRoles array based on the UI
         selectedUsersAndRoles = [];
-
-        $('.js-example-basic-multiple option:selected').each(function() {
+        
+        $('.js-example-basic-multiple option:selected').each(function() {    
             var userId = $(this).val();
             var userName = $(this).text();
-            var existingUserRole = selectedUsersAndRoles.find(userRole => userRole.id === userId);
-
+            var existingUserRole = $('#'+ userName +'-role').val();
             var userRole = {
                 id: userId,
                 name: userName,
-                role: existingUserRole ? existingUserRole.role : ''
+                role: existingUserRole ? existingUserRole : ''
             };
 
             selectedUsersAndRoles.push(userRole);
