@@ -25,4 +25,9 @@ class Task extends Model
     {
         return $this->belongsTo(Project::class, 'project_id');
     }
+
+    public function parents()
+    {
+        return $this->belongsToMany(Task::class, 'task_tasks');
+    }
 }

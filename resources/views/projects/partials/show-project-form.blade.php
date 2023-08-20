@@ -1,3 +1,4 @@
+<?php use App\Models\ProjectUser; ?>
 <div class="container">
     @if (session('success'))
         <div class="alert alert-success">
@@ -41,6 +42,20 @@
                                 </span>
                             @enderror
                         </div>
+
+                        <div class="form-group">
+                            <label>{{ __('Collaborator') }}</label><br>
+                            <ul>
+                                @foreach ($users as $_user)
+                                    @if($_user->id != $project->_creator->id)
+                                    @if($projectUsers->contains('user_id', $_user->id))
+                                    <li>{{$_user->name}}: {{(ProjectUser::where('project_id',$project->id)->where('user_id',$_user->id)->value('type'))}}</li>
+                                    
+                                    @endif
+                                    @endif
+                                @endforeach
+                            </ul>
+                            </div>
 
                         <div class="form-group mb-0">
                             <button type="submit" class="btn btn-primary" disabled>

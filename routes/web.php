@@ -25,13 +25,18 @@ Route::get('/', function () {
 });
 Route::get('/home', [HomeController::class, 'index'])->name('home');
 //projectscontrollers
-Route::get('/projects', [ProjectsController::class, 'index'])->name('projects.index');
-Route::get('/projects/create', [ProjectsController::class, 'create'])->name('projects.create');
-Route::get('/projects/{project:id}', [ProjectsController::class, 'show'])->name('projects.show');
-Route::get('/projects/{project:id}/edit', [ProjectsController::class, 'edit'])->name('projects.edit');
-Route::post('/projects', [ProjectsController::class, 'store'])->name('projects.store');
-Route::put('/projects/{project:id}', [ProjectsController::class, 'update'])->name('projects.update');
-Route::delete('projects/{project:id}', [ProjectsController::class, 'destroy'])->name('projects.destroy');
+Route::middleware(['auth'])->group(function () {
+    Route::get('/projects', [ProjectsController::class, 'index'])->name('projects.index');
+    Route::get('/projects/create', [ProjectsController::class, 'create'])->name('projects.create');
+    Route::get('/projects/{project:id}', [ProjectsController::class, 'show'])->name('projects.show');
+    Route::get('/projects/{project:id}/edit', [ProjectsController::class, 'edit'])->name('projects.edit');
+    Route::post('/projects', [ProjectsController::class, 'store'])->name('projects.store');
+    Route::put('/projects/{project:id}', [ProjectsController::class, 'update'])->name('projects.update');
+    Route::delete('projects/{project:id}', [ProjectsController::class, 'destroy'])->name('projects.destroy');
+    //ajax
+    Route::post('/projects/handle-selected-users', [ProjectsController::class, 'handleSelectedUsers'])->name('projects.handle.selected.users');
+    Route::get('/fetch-roles', [RoleController::class, 'fetchRoles'])->name('roles.fetch');
+});
 //tasksController
 Route::get('/tasks', [TasksController::class, 'index'])->name('tasks.index');
 Route::get('/tasks/create', [TasksController::class, 'create'])->name('tasks.create');

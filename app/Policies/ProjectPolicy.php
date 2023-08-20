@@ -21,10 +21,18 @@ class ProjectPolicy
     }
     public function update(User $user, Project $project)
     {
-        return $user->id === $project->creator;
+        return $project->collaborators->contains($user) || $user->id === $project->creator;
     }
     public function destroy(User $user, Project $project)
     {
         return $user->id === $project->creator;
+    }
+    public function edit(User $user, Project $project)
+    {
+        return $project->collaborators->contains($user) || $user->id === $project->creator;
+    }
+    public function show(User $user, Project $project)
+    {
+        return $project->collaborators->contains($user) || $user->id === $project->creator;
     }
 }

@@ -36,9 +36,15 @@
                     <td>{{ $project->_creator->name }}</td>
                     <td>{{ $project->description }}</td>
                     <td>
-                      <button {{$user->id==$project->creator?'':'disabled';}} type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteModal{{ $project->id }}">
+                      @can('destroy', $project)
+                      <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteModal{{ $project->id }}">
                         Delete
                       </button>
+                      @else
+                      <button disabled type="button" class="btn btn-danger">
+                        Delete
+                      </button>
+                      @endcan
                       <div class="modal fade" id="deleteModal{{ $project->id }}" tabindex="-1" role="dialog">
                         <div class="modal-dialog" role="document">
                           <div class="modal-content">
@@ -64,14 +70,23 @@
                       </div>
                     </td>
                     <td>
+                      @can('edit', $project)
                       <form action="{{ route('projects.edit', ['project' => $project]) }}" method="GET">
-                        <button {{$user->id==$project->creator?'':'disabled';}} class="btn btn-dark" type="submit">Edit</button>
+                        <button class="btn btn-dark" type="submit">Edit</button>
                       </form>
+                      @else
+                        <button disabled class="btn btn-dark" type="submit">Edit</button>
+                      @endcan
                     </td>
                     <td>
+                      @can('show', $project)
                       <form action="{{ route('projects.show', ['project' => $project]) }}" method="GET">
                         <button class="btn btn-primary" type="submit">View</button>
                       </form>
+                      @else
+                        <button disabled class="btn btn-primary" type="submit">View</button>
+                      @endcan
+                      
                     </td>
                   </tr>
                 @endforeach

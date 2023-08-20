@@ -19,4 +19,9 @@ class Project extends Model
     {
         return $this->belongsTo(User::class, 'creator');
     }
+
+    public function collaborators()
+    {
+        return $this->belongsToMany(User::class, 'project_users')->withPivot('type');
+    }
 }

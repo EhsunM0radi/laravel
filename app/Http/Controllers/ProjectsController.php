@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use App\Models\Project;
+use App\Models\ProjectUser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -29,8 +31,13 @@ class ProjectsController extends Controller
      */
     public function create()
     {
+        $roles = [
+            'developer',
+            'tester',
+            'project manager'
+        ];
         if (Auth::check()) {
-            return view('projects.create', ['projects' => Project::all(), 'user' => Auth::user()]);
+            return view('projects.create', ['roles' => $roles, 'projects' => Project::all(), 'user' => Auth::user(), 'users' => User::all()]);
         } else {
             return redirect()->route('login');
         }
@@ -44,23 +51,29 @@ class ProjectsController extends Controller
      */
     public function store(Request $request)
     {
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            'creator' => 'required',
+            'users' => 'array',
+        ]);
+        $project = Project::create([
+            'title' => $request->input('title'),
+            'creator' => $request->input('creator'),
+            'description' => $request->input('description')
+        ]);
+        $lastInsertedId = $project->id;
+        $users = $request->input('users', []);
 
-        if (Auth::check()) {
-            $request->validate([
-                'title' => 'required|string|max:255',
-                'description' => 'required|string',
-                'creator' => 'required',
+        foreach ($users as $key => $user) {
+            $project_user = ProjectUser::create([
+                'project_id' => $lastInsertedId,
+                'user_id' => $user,
+                'type' => $request->input('role' . strval($key))
             ]);
-            $project = new Project([
-                'title' => $request->input('title'),
-                'creator' => $request->input('creator'),
-                'description' => $request->input('description'),
-            ]);
-            $project->save();
-            return redirect()->route('projects.index')->with('success', 'Project created successfully.');
-        } else {
-            return redirect()->route('login');
         }
+
+        return redirect()->route('projects.index')->with('success', 'Project created successfully.');
     }
 
     /**
@@ -76,7 +89,7 @@ class ProjectsController extends Controller
                 return redirect()->route('projects.index')->with('error', 'Project not found.');
             }
 
-            return view('projects.show', ['project' => $project]);
+            return view('projects.show', ['project' => $project, 'users' => User::all(), 'projectUsers' => ProjectUser::where('project_id', $project->id)->get()]);
         } else {
             return redirect()->route('login');
         }
@@ -90,14 +103,15 @@ class ProjectsController extends Controller
      */
     public function edit(Project $project)
     {
-        if (Auth::check()) {
-            if (!$project) {
-                return redirect()->route('projects.index')->with('error', 'Project not found.');
-            }
-            return view('projects.edit', ['project' => $project, 'user' => Auth::user()]);
-        } else {
-            return redirect()->route('login');
+        $roles = [
+            'developer',
+            'tester',
+            'project manager'
+        ];
+        if (!$project) {
+            return redirect()->route('projects.index')->with('error', 'Project not found.');
         }
+        return view('projects.edit', ['roles' => $roles, 'project' => $project, 'user' => Auth::user(), 'users' => User::all(), 'projectUsers' => ProjectUser::where('project_id', $project->id)->get()]);
     }
 
     /**
@@ -116,6 +130,7 @@ class ProjectsController extends Controller
                 'title' => 'required|string|max:255',
                 'creator' => 'required',
                 'description' => 'required|string',
+                'users' => 'array'
             ]);
             if (!$request->isMethod('put')) {
                 // Handle invalid request method (optional)
@@ -127,6 +142,19 @@ class ProjectsController extends Controller
             $incomingFields['description'] = strip_tags($incomingFields['description']);
 
             $project->update($incomingFields);
+
+            $selectedUserIds = $request->input('users', []);
+
+            // Delete existing project-user relationships for the project
+            ProjectUser::where('project_id', $project->id)->delete();
+
+            // Insert new project-user relationships based on selected users
+            foreach ($selectedUserIds as $userId) {
+                ProjectUser::create([
+                    'project_id' => $project->id,
+                    'user_id' => $userId,
+                ]);
+            }
 
             return redirect()->route('projects.show', ['project' => $project])->with('success', 'Project updated successfully.');
         } else {
@@ -153,5 +181,16 @@ class ProjectsController extends Controller
             // User is not authenticated, redirect to the login page
             return redirect()->route('login');
         }
+    }
+
+    public function handleSelectedUsers(Request $request)
+    {
+        $selectedUserIds = $request->input('selectedUsers'); // Array of selected user IDs
+
+        // Fetch user details based on selectedUserIds
+        $selectedUsers = User::whereIn('id', $selectedUserIds)->get();
+
+        // Return a JSON response with the selected users
+        return response()->json(['selectedUsers' => $selectedUsers]);
     }
 }
