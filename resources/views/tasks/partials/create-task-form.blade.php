@@ -16,7 +16,7 @@
             <textarea class="form-control" name="description" id="description" rows="4" required></textarea>
         </div>
 
-        <div class="form-group">
+        {{-- <div class="form-group">
             <label for="project_id">Project Name:</label>
             <select class="form-control" name="project_id" id="project_id" required>
                 <option value="" disabled selected>Select a project</option>
@@ -24,7 +24,24 @@
                     <option value="{{ $project->id }}">{{ $project->title }}</option>
                 @endforeach
             </select>
+        </div> --}}
+        <input type="hidden" value=1 name="project_id">
+
+        <div class="form-group">
+            <label for="title">Parent:</label>
+            <select class="form-control" name="parent" id="parent">
+                <option value="" disabled selected>Select a task</option>
+                @foreach ($tasks as $task)
+                    <option value="{{ $project->id }}">{{ $project->title }}</option>
+                @endforeach
+            </select>
         </div>
+
+        <div class="form-group">
+            <label for="estimate">Estimate:</label>
+            <input type="number" class="form-control" name="estimate" id="estimate" required>
+        </div>
+
 
         <button type="submit" class="btn btn-primary">Create Task</button>
     </form>

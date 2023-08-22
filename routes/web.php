@@ -38,12 +38,15 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/fetch-roles', [RoleController::class, 'fetchRoles'])->name('roles.fetch');
 });
 //tasksController
-Route::get('/tasks', [TasksController::class, 'index'])->name('tasks.index');
-Route::get('/tasks/create', [TasksController::class, 'create'])->name('tasks.create');
-Route::get('/tasks/{task:id}', [TasksController::class, 'show'])->name('tasks.show');
-Route::get('/tasks/{task:id}/edit', [TasksController::class, 'edit'])->name('tasks.edit');
-Route::post('/tasks', [TasksController::class, 'store'])->name('tasks.store');
-Route::put('/tasks/{task:id}', [TasksController::class, 'update'])->name('tasks.update');
-Route::delete('tasks/{task:id}', [TasksController::class, 'destroy'])->name('tasks.destroy');
-
+Route::middleware(['auth'])->group(function () {
+    Route::get('/tasks', [TasksController::class, 'index'])->name('tasks.index');
+    Route::get('/tasks/create', [TasksController::class, 'create'])->name('tasks.create');
+    Route::get('/tasks/{task:id}', [TasksController::class, 'show'])->name('tasks.show');
+    Route::get('/tasks/{task:id}/edit', [TasksController::class, 'edit'])->name('tasks.edit');
+    Route::post('/tasks', [TasksController::class, 'store'])->name('tasks.store');
+    Route::put('/tasks/{task:id}', [TasksController::class, 'update'])->name('tasks.update');
+    Route::delete('tasks/{task:id}', [TasksController::class, 'destroy'])->name('tasks.destroy');
+    //ajax
+    Route::post('tasks/chooseProject', [TasksController::class, 'chooseProject'])->name('tasks.chooseProject');
+});
 Auth::routes();

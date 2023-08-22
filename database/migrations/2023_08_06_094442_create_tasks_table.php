@@ -23,9 +23,9 @@ class CreateTasksTable extends Migration
 
             // Define foreign key constraint
             $table->foreign('project_id')->references('id')->on('projects')->onDelete('cascade')->onUpdate('cascade');
-            $table->unsignedBigInteger('parent');
+            $table->unsignedBigInteger('parent')->nullable(true);
             $table->foreign('parent')->references('id')->on('tasks')->onDelete('Cascade')->onUpdate('Cascade');
-            $table->unsignedBigInteger('estimate');
+            $table->unsignedBigInteger('estimate')->default(20);
             $table->timestamps();
         });
     }

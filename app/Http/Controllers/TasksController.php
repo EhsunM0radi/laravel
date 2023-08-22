@@ -3,8 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Task;
-use App\Models\Project;
 use App\Models\User;
+use App\Models\Project;
+use App\Models\ProjectUser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -18,7 +19,11 @@ class TasksController extends Controller
     public function index()
     {
         if (Auth::check()) {
-            return view('tasks.index', ['tasks' => Task::all(), 'user' => Auth::user()]);
+            $user = Auth::user();
+            $projectsUserCreate = Project::where('creator', $user->id)->get();
+            $projectsUserCollaborate = ProjectUser::where('user_id', $user->id)->get();
+
+            return view('tasks.index', ['tasks' => Task::all(), 'user' => $user, 'projectsUserCreate' => $projectsUserCreate, 'projectsUserCollaborate' => $projectsUserCollaborate]);
         } else {
             // User is not authenticated, redirect to the login page
             return redirect()->route('login');
@@ -48,26 +53,22 @@ class TasksController extends Controller
      */
     public function store(Request $request)
     {
-
-        if (Auth::check()) {
-            $request->validate([
-                'title' => 'required|string|max:255',
-                'description' => 'required|string',
-                'creator' => 'required',
-                'project_id' => 'required'
-            ]);
-            $task = new Task([
-                'title' => $request->input('title'),
-                'creator' => $request->input('creator'),
-                'description' => $request->input('description'),
-                'project_id' => $request->input('project_id')
-            ]);
-            $task->save();
-            return redirect()->route('tasks.index')->with('success', 'task created successfully.');
-        } else {
-            // User is not authenticated, redirect to the login page
-            return redirect()->route('login');
-        }
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            'creator' => 'required',
+            'project_id' => 'required',
+            'estimate' => 'required'
+        ]);
+        $task = new Task([
+            'title' => $request->input('title'),
+            'creator' => $request->input('creator'),
+            'description' => $request->input('description'),
+            'project_id' => $request->input('project_id'),
+            'estimate' => $request->input('estimate')
+        ]);
+        $task->save();
+        return redirect()->route('tasks.index')->with('success', 'task created successfully.');
     }
 
     /**
@@ -157,5 +158,24 @@ class TasksController extends Controller
             // User is not authenticated, redirect to the login page
             return redirect()->route('login');
         }
+    }
+    public function chooseProject(Request $request)
+    {
+        // Validate that the request has a selected project
+        $request->validate([
+            'selected' => 'required'
+        ]);
+
+        // Get the JSON response of the selected project
+        $response = $request->input('selected')['jsonResponse'];
+
+        // Check if the response is empty or invalid
+        // if (empty($response) || !is_array($response)) {
+        //     // Abort with a 404 error
+        //     abort(404, 'Invalid project response');
+        // }
+
+        // Return the response
+        return response()->json($response);
     }
 }

@@ -11,12 +11,23 @@
     @endif
     <div class="container">
       <a href="{{ route('tasks.create') }}" style="display: inline-block;"><h4>Add new Task +</h4></a><br>
+      <span>
+        <select class="js-example-basic-multiple" name="projectForUser">
+          <option value="0">Choose a Project</option>
+          @foreach ($projectsUserCreate as $projectUserCreate)
+              <option value="{{$projectUserCreate->id}}">{{$projectUserCreate->title}}</option>
+          @endforeach
+          @foreach ($projectsUserCollaborate as $projectUserCollaborate)
+              <option value="{{$projectUserCollaborate->project_id}}">{{$projectUserCollaborate->projectId->title}}</option>
+          @endforeach
+        </select>
+      </span>
       <div class="card">
         <div class="card-header">{{ __('Tasks List') }}</div>
     
         <div class="card-body">
           <div class="table-responsive">
-            <table class="table table-striped">
+            <table id="my-table">
               <thead>
                 <tr>
                   <th>ID</th>
@@ -30,7 +41,7 @@
                 </tr>
               </thead>
               <tbody>
-                @foreach ($tasks as $task)
+                {{-- @foreach ($tasks as $task)
                   <tr>
                     <td>{{ $task->id }}</td>
                     <td>{{ $task->title }}</td>
@@ -76,11 +87,41 @@
                       </form>
                     </td>
                   </tr>
-                @endforeach
+                @endforeach --}}
               </tbody>
             </table>
           </div>
         </div>
       </div>
     </div>
+    <script>
+      $(document).ready(function () {
+        //initialize the datatables plugin on my table element
+        var myTable = $('#my-table').dataTable({
+  columns: [
+    { title: 'ID', data: 'id' }, // use the id property of the task object
+    { title: 'Title', data: 'title' }, // use the title property of the task object
+    { title: 'Description', data: 'description' }
+  ]
+});
+        //ajax for drop down to choose project
+        $('[name="projectForUser"]').on('change', function () {
+          $.ajax({
+        type: "post",
+        url: "{{route('tasks.chooseProject')}}",
+        data: {'selected': {'jsonResponse': $('[name="projectForUser"]').val()},
+        '_token': '{{ csrf_token() }}'
+},
+        dataType: "json",
+        success: function (response) {
+          for (var i = 0; i < {{strlen($tasks)}}; i++) {
+            var tasks = {{$tasks}};
+            var task = tasks[i];
+            myTable.row.add(task).draw();
+      }
+        }
+      });  
+      });  
+        });
+    </script>
 @endsection

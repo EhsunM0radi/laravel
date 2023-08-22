@@ -149,10 +149,11 @@ class ProjectsController extends Controller
             ProjectUser::where('project_id', $project->id)->delete();
 
             // Insert new project-user relationships based on selected users
-            foreach ($selectedUserIds as $userId) {
+            foreach ($selectedUserIds as $key => $userId) {
                 ProjectUser::create([
                     'project_id' => $project->id,
                     'user_id' => $userId,
+                    'type' => $request->input('role' . strval($key))
                 ]);
             }
 

@@ -21,7 +21,7 @@
                             @enderror
                         </div>
 
-                            <input id="creator" type="hidden" class="form-control @error('creator') is-invalid @enderror" name="creator" value="{{$user->id}}" required>
+                            <input id="creator" type="hidden" class="form-control @error('creator') is-invalid @enderror" name="creator" value="{{$project->creator}}" required>
                             @error('creator')
                                 <span class="invalid-feedback" role="alert">
                                     <strong>{{ $message }}</strong>
@@ -42,7 +42,9 @@
                             <label>{{ __('Collaborator') }}</label><br>
                             <select id="selectedUsers" class="js-example-basic-multiple" name="users[]" multiple="multiple">
                                 @foreach ($users as $_user)
+                                @if($_user->id != $project->creator)
                                     <option value="{{$_user->id}}" {{($projectUsers->contains('user_id', $_user->id))?'selected':''}}>{{$_user->name}}</option>
+                                @endif
                                 @endforeach
                               </select>
                             </div>

@@ -16,7 +16,7 @@
     
         <div class="card-body">
           <div class="table-responsive">
-            <table class="table table-striped">
+            <table id="my-table">
               <thead>
                 <tr>
                   <th>ID</th>
@@ -96,5 +96,9 @@
         </div>
       </div>
     </div>
-
+    <script type="text/javascript">
+      $(document).ready(function() {
+        $('#my-table').dataTable();
+      });
+    </script>
 @endsection
