@@ -1,13 +1,9 @@
 @php
     use App\Models\ProjectUser;
 @endphp
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">{{ __('Edit project') }}</div>
+<div class="container mt-4">
 
-                <div class="card-body">
+                <h1>{{ __('Edit project') }}</h1>
                     <form action="{{ route('projects.update',['project'=> $project]) }}" method="POST">
                         @csrf
                         @method('PUT')
@@ -63,10 +59,6 @@
                             </button>
                         </div>
                     </form>
-                </div>
-            </div>
-        </div>
-    </div>
 </div>
 <script>
 $(document).ready(function() {

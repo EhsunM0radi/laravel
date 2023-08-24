@@ -1,10 +1,6 @@
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">{{ __('Create New project') }}</div>
+<div class="container mt-4">
+                <h1>{{ __('Create New project') }}</h1>
 
-                <div class="card-body">
                     <form action="{{ route('projects.store') }}" method="POST">
                         @csrf
 
@@ -59,10 +55,6 @@
                             </button>
                         </div>
                     </form>
-                </div>
-            </div>
-        </div>
-    </div>
 </div>
 <script>
 $(document).ready(function() {

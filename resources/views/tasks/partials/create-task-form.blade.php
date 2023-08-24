@@ -25,14 +25,14 @@
                 @endforeach
             </select>
         </div> --}}
-        <input type="hidden" value=1 name="project_id">
+        <input type="hidden" value={{$project_id}} name="project_id">
 
         <div class="form-group">
-            <label for="title">Parent:</label>
+            <label for="parent">Parent:</label>
             <select class="form-control" name="parent" id="parent">
-                <option value="" disabled selected>Select a task</option>
-                @foreach ($tasks as $task)
-                    <option value="{{ $project->id }}">{{ $project->title }}</option>
+                <option value="">Select a task</option>
+                @foreach ($tasks as $_task)
+                    <option value={{ $_task->id }}>{{ $_task->title }}</option>
                 @endforeach
             </select>
         </div>
@@ -42,6 +42,23 @@
             <input type="number" class="form-control" name="estimate" id="estimate" required>
         </div>
 
+        <div class="form-group">
+            <label for="status">Status:</label>
+            <select class="form-control" name="status" id="status">
+                @foreach ($allStatus as $status)
+                    <option value="{{ $status }}">{{ $status }}</option>
+                @endforeach
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="requirements">Requirements:</label>
+            <select class="form-control js-example-basic-multiple" name="requirements[]" id="requirements" multiple='multiple'>
+                @foreach ($tasks as $_task)
+                    <option value="{{$_task->id}}">{{$_task->title}}</option>
+                @endforeach
+            </select>
+        </div>
 
         <button type="submit" class="btn btn-primary">Create Task</button>
     </form>

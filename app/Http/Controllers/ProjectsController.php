@@ -17,11 +17,7 @@ class ProjectsController extends Controller
      */
     public function index()
     {
-        if (Auth::check()) {
-            return view('projects.index', ['projects' => Project::all(), 'user' => Auth::user()]);
-        } else {
-            return redirect()->route('login');
-        }
+        return view('projects.index', ['projects' => Project::all(), 'user' => Auth::user()]);
     }
 
     /**
@@ -36,11 +32,7 @@ class ProjectsController extends Controller
             'tester',
             'project manager'
         ];
-        if (Auth::check()) {
-            return view('projects.create', ['roles' => $roles, 'projects' => Project::all(), 'user' => Auth::user(), 'users' => User::all()]);
-        } else {
-            return redirect()->route('login');
-        }
+        return view('projects.create', ['roles' => $roles, 'projects' => Project::all(), 'user' => Auth::user(), 'users' => User::all()]);
     }
 
     /**
@@ -84,15 +76,11 @@ class ProjectsController extends Controller
      */
     public function show(Project $project)
     {
-        if (Auth::check()) {
-            if (!$project) {
-                return redirect()->route('projects.index')->with('error', 'Project not found.');
-            }
-
-            return view('projects.show', ['project' => $project, 'users' => User::all(), 'projectUsers' => ProjectUser::where('project_id', $project->id)->get()]);
-        } else {
-            return redirect()->route('login');
+        if (!$project) {
+            return redirect()->route('projects.index')->with('error', 'Project not found.');
         }
+
+        return view('projects.show', ['project' => $project, 'users' => User::all(), 'projectUsers' => ProjectUser::where('project_id', $project->id)->get()]);
     }
 
     /**
@@ -173,15 +161,10 @@ class ProjectsController extends Controller
     {
         $this->authorize('destroy', $project);
 
-        if (Auth::check()) {
-            $project->delete();
+        $project->delete();
 
-            // Redirect to a specified route
-            return redirect()->route('projects.index')->with('success', 'Project deleted successfully.');
-        } else {
-            // User is not authenticated, redirect to the login page
-            return redirect()->route('login');
-        }
+        // Redirect to a specified route
+        return redirect()->route('projects.index')->with('success', 'Project deleted successfully.');
     }
 
     public function handleSelectedUsers(Request $request)

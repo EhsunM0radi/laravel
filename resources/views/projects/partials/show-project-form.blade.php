@@ -1,16 +1,13 @@
 <?php use App\Models\ProjectUser; ?>
-<div class="container">
+<div class="container mt-4">
+
     @if (session('success'))
         <div class="alert alert-success">
             {{ session('success') }}
         </div>
     @endif
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">{{ __('project') }}</div>
+                <h1>{{ __('project') }}</h1>
 
-                <div class="card-body">
                     <form action="#" >
                         @csrf
                         <div class="form-group">
@@ -63,8 +60,4 @@
                             </button>
                         </div>
                     </form>
-                </div>
-            </div>
-        </div>
-    </div>
 </div>

@@ -29,5 +29,40 @@
                 @endforeach
             </select>
         </div>
+
+        <div class="form-group">
+            <label for="parent">Parent:</label>
+            <select class="form-control" name="parent" id="parent">
+                <option value="" selected>Select a task</option>
+                @foreach ($tasks as $_task)
+                    <option value="{{ $_task->id }}" {{$task->id==$_task->id?'selected':''}}>{{ $_task->title }}</option>
+                @endforeach
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="estimate">Estimate:</label>
+            <input disabled type="number" value="{{$task->estimate}}" class="form-control" name="estimate" id="estimate" required>
+        </div>
+
+        <div class="form-group">
+            <label for="status">Status:</label>
+            <select disabled class="form-control" name="status" id="status">
+                @foreach ($allStatus as $status)
+                    <option value="{{ $status }}" {{$status==$task->status?'selected':'';}}>{{ $status }}</option>
+                @endforeach
+            </select>
+        </div>
+
+
+        <div class="form-group">
+            <label for="requirements">Requirements:</label>
+            <select disabled class="form-control js-example-basic-multiple" name="requirements[]" id="requirements" multiple='multiple'>
+                @foreach ($tasks as $_task)
+                    <option value="{{$_task->id}}">{{$_task->title}}</option>
+                @endforeach
+            </select>
+        </div>
+
     </form>
 </div>
